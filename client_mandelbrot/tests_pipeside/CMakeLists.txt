@@ -1,0 +1,3 @@
+add_executable(MandelbrotPipesideTester pipeside_tests.cpp)
+target_include_directories(MandelbrotPipesideTester PUBLIC ../src)
+target_link_libraries(MandelbrotPipesideTester MandelbrotClientLib)
