@@ -11,17 +11,13 @@
 class WindowToComplexPlaneMapper {
 
 public:
-    WindowToComplexPlaneMapper(const ApplicationState &state);
+    WindowToComplexPlaneMapper(ApplicationState &state);
 
-    double getLeftTopX();
-
-    double getLeftTopY();
-
-    double getRightBottomX();
-
-    double getRightBottomY();
+    void remapCoordinates();
 private:
-    ApplicationState applicationState;
+    ApplicationState& applicationState;
+
+    static double calculateNewPosition(int mouseCoord, double smallerCoordEdge, double biggerCoordEdge, int screenSize);
 };
 
 

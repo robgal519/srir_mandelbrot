@@ -15,7 +15,6 @@ struct Request {
     double leftTopY;
     double rightBottomX;
     double rightBottomY;
-    Pixel color;
 };
 
 class DataRequestNamedPipe {

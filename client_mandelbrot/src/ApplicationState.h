@@ -7,6 +7,7 @@
 
 
 #include "Pixel.h"
+#include <utility>
 
 struct ApplicationState {
     int running = true;
@@ -17,7 +18,9 @@ struct ApplicationState {
     double rightBottomX = 0.5;
     double rightBottomY = -1.5;
     bool requestImage = true;
-    Pixel chosenColor = {0, 0xff, 0};
+    bool keyDown = false;
+    std::pair<int, int> firstMouseClick = {0, 0};
+    std::pair<int, int> secondMouseClick = {windowWidth, windowHeight};
 };
 
 

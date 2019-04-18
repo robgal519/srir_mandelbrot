@@ -34,9 +34,17 @@ void testingFunction (){
         }
         requests++;
         std::cout << "T: Request " << requests << " read." << std::endl;
+        std::cout << "T: Request details:" << std::endl;
+        std::cout << "T: window_width = " << request.windowWidth << std::endl;
+        std::cout << "T: window_height = " << request.windowHeight << std::endl;
+        std::cout << "T: left_top_x = " << request.leftTopX << std::endl;
+        std::cout << "T: left_top_y = " << request.leftTopY << std::endl;
+        std::cout << "T: right_bottom_x = " << request.rightBottomX << std::endl;
+        std::cout << "T: right_bottom_y = " << request.rightBottomY << std::endl;
         std::cout << "T: Sending response.." << std::endl;
+        Pixel color {0, 0, 0xff};
         for(int i=0; i<request.windowHeight*request.windowWidth; i++){
-            status = write(responsePipe, &request.color, sizeof(request.color));
+            status = write(responsePipe, &color, sizeof(color));
             if(status == -1){
                 throw CannotWriteToNamedPipeException("Cannot write to " + resp);
             }

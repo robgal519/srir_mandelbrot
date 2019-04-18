@@ -78,18 +78,20 @@ void Application::handlePipes() {
 
     WindowToComplexPlaneMapper mapper(applicationState);
 
+    mapper.remapCoordinates();
+
     Request imageRequest{
             applicationState.windowWidth,
             applicationState.windowHeight,
-            mapper.getLeftTopX(),
-            mapper.getLeftTopY(),
-            mapper.getRightBottomX(),
-            mapper.getRightBottomY(),
-            applicationState.chosenColor
+            applicationState.leftTopX,
+            applicationState.leftTopY,
+            applicationState.rightBottomX,
+            applicationState.rightBottomY
     };
 
     requestImagePipe.sendRequest(imageRequest);
     responseImagePipe.readResponse(currentImage, applicationState.windowWidth, applicationState.windowHeight);
+    applicationState.requestImage = false;
 }
 
 void Application::handleEvents() {
@@ -99,19 +101,25 @@ void Application::handleEvents() {
             case SDL_QUIT:
                 applicationState.running = false;
                 break;
-            case SDL_KEYUP:
-                if (event.key.keysym.sym == SDLK_q) {
-                    applicationState.requestImage = !applicationState.requestImage;
-                }
-                if (event.key.keysym.sym == SDLK_r) {
-                    applicationState.chosenColor = Pixel::RED;
-                }
-                if (event.key.keysym.sym == SDLK_g) {
-                    applicationState.chosenColor = Pixel::GREEN;
-                }
-                if (event.key.keysym.sym == SDLK_b) {
-                    applicationState.chosenColor = Pixel::BLUE;
-                }
+            case SDL_WINDOWEVENT:
+                if(event.window.event != SDL_WINDOWEVENT_SIZE_CHANGED) break;
+                applicationState.windowWidth = event.window.data1;
+                applicationState.windowHeight = event.window.data2;
+                applicationState.requestImage = true;
+                break;
+            case SDL_MOUSEMOTION:
+                applicationState.secondMouseClick = std::make_pair(event.button.x, event.button.y);
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                if (event.button.button != SDL_BUTTON_LEFT) break;
+                applicationState.firstMouseClick = std::make_pair(event.button.x, event.button.y);
+                applicationState.keyDown = true;
+                break;
+            case SDL_MOUSEBUTTONUP:
+                if (event.button.button != SDL_BUTTON_LEFT) break;
+                applicationState.secondMouseClick = std::make_pair(event.button.x, event.button.y);
+                applicationState.keyDown = false;
+                applicationState.requestImage = true;
                 break;
         }
     }
@@ -129,6 +137,15 @@ void Application::render() {
             );
 
     SDL_RenderCopy(renderer, texture, nullptr, nullptr);
+    if (applicationState.keyDown) {
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+        SDL_Rect outline{applicationState.firstMouseClick.first,
+                         applicationState.secondMouseClick.second,
+                         applicationState.secondMouseClick.first - applicationState.firstMouseClick.first,
+                         applicationState.firstMouseClick.second - applicationState.secondMouseClick.second};
+        SDL_RenderDrawRect(renderer, &outline);
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+    }
     SDL_RenderPresent(renderer);
 }
 
