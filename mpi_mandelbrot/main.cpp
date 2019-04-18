@@ -43,14 +43,14 @@ int main(int argc, char *argv[]) {
 
 //////////////////////////////////
     int width = 1700;
-    int hight = 800;
+    int hight = 600;
 // whole picture is in rectangle between {-2,1} and {1,-1}
     std::pair<double, double> start = {-2, 1};
     std::pair<double, double> end = {1, -1};
     std::vector<char> result;
     if (procid != 0) {
 
-        for (int y = 0; y < hight; y+= (numprocs-1)) {
+        for (int y = procid-1; y < hight; y+= (numprocs-1)) {
             //std::vector<RGB> line(width);
             char line[width * 3];
             for (int x = 0; x < width; x++) {
@@ -65,21 +65,14 @@ int main(int argc, char *argv[]) {
             MPI_Send(line, width * 3, MPI_CHAR, 0, 0, MPI_COMM_WORLD);
         }
     } else {
-        for (int y = 0; y < hight / (numprocs - 1); y++) {
+        for (int y = 0; y < hight; y++) {
             char line[width * 3];
-            for (int i = 1; i < numprocs; i++) {
                 MPI_Status status;
-                MPI_Recv(&line, width * 3, MPI_CHAR, i, 0, MPI_COMM_WORLD, &status);
-
-
+                MPI_Recv(&line, width * 3, MPI_CHAR, y%(numprocs-1) +1, 0, MPI_COMM_WORLD, &status);
                 result.insert(std::end(result), line, line + width * 3);
-            }
-        }
 
+        }
         std::ofstream plot("data.ppm");
-        unsigned long int totalPixels = width * hight;
-        int procents = 0;
-        int donePixels = 0;
 
         plot << "P6" << std::endl;
         plot << width << " " << hight << std::endl;
