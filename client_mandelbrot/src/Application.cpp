@@ -75,12 +75,13 @@ void Application::start() {
 
 void Application::handlePipes() {
     if (!applicationState.requestImage) return;
+    applicationState.requestImage = false;
 
     WindowToComplexPlaneMapper mapper(applicationState);
-
     mapper.remapCoordinates();
 
     Request imageRequest{
+            applicationState.running,
             applicationState.windowWidth,
             applicationState.windowHeight,
             applicationState.leftTopX,
@@ -90,8 +91,8 @@ void Application::handlePipes() {
     };
 
     requestImagePipe.sendRequest(imageRequest);
+    if(!applicationState.running) return;
     responseImagePipe.readResponse(currentImage, applicationState.windowWidth, applicationState.windowHeight);
-    applicationState.requestImage = false;
 }
 
 void Application::handleEvents() {
@@ -100,6 +101,7 @@ void Application::handleEvents() {
         switch (event.type) {
             case SDL_QUIT:
                 applicationState.running = false;
+                applicationState.requestImage = true;
                 break;
             case SDL_WINDOWEVENT:
                 if(event.window.event != SDL_WINDOWEVENT_SIZE_CHANGED) break;

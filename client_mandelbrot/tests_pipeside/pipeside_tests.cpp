@@ -32,9 +32,14 @@ void testingFunction (){
         if(status == -1){
             throw CannotReadFromNamedPipeException("Cannot read from " + req);
         }
+        if(!request.connectionOk){
+            std::cout << "T: Closing connection!" << std::endl;
+            break;
+        }
         requests++;
         std::cout << "T: Request " << requests << " read." << std::endl;
         std::cout << "T: Request details:" << std::endl;
+        std::cout << "T: connection_ok = " << request.connectionOk << std::endl;
         std::cout << "T: window_width = " << request.windowWidth << std::endl;
         std::cout << "T: window_height = " << request.windowHeight << std::endl;
         std::cout << "T: left_top_x = " << request.leftTopX << std::endl;

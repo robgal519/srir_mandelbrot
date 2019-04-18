@@ -2,6 +2,7 @@
 // Created by glaeqen on 07/04/19.
 //
 
+#include <iostream>
 #include "WindowToComplexPlaneMapper.h"
 
 WindowToComplexPlaneMapper::WindowToComplexPlaneMapper(ApplicationState &state)

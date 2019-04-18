@@ -9,6 +9,7 @@
 #include <fcntl.h>
 
 struct Request {
+    bool connectionOk;
     int windowWidth;
     int windowHeight;
     double leftTopX;
