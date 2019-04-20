@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2019 AGH FiIS
  */
-#include <fstream>
+
 #include <iostream>
 #include <thread>
 #include <cmath>
@@ -63,13 +63,13 @@ if(procid == 0){
     mkfifo(resp.c_str(), 0777);
 
     std::cout << "T: Opening req R" << std::endl;
-    int requestPipe = open(req.c_str(), O_RDONLY);
+    requestPipe = open(req.c_str(), O_RDONLY);
     if(requestPipe == -1){
         throw -1;
     }
     std::cout << "T: Opened req R" << std::endl;
     std::cout << "T: Opening resp W" << std::endl;
-    int responsePipe = open(resp.c_str(), O_WRONLY);
+    responsePipe = open(resp.c_str(), O_WRONLY);
     if(responsePipe == -1) {
         throw -1;
     }
@@ -81,12 +81,13 @@ while(condition) {
     Request request;
     int status;
     if (procid == 0) {
-        std::cout<< "0 read request"<<std::endl;
+        std::cout<< "0 read request"<< sizeof(request)<<std::endl;
         status = read(requestPipe, &request, sizeof(Request));
+        std::cout<<procid<<" "<<status<<std::endl;
         if(status == -1){
             throw -1;
         }
-        std::cout<<"0 request readed"<<std::endl;   
+        std::cout<<"0 request readed \n"<< request.windowHeight<< " " << request.windowWidth<<std::endl;
     }
     MPI_Bcast(&request, sizeof(Request),MPI_CHAR,0,MPI_COMM_WORLD);
     std::cout<<procid << " received broadcast\n";
