@@ -24,11 +24,10 @@ inline double rSq(double Re, double Im) {
     return Re * Re + Im * Im;
 }
 
-unsigned int inMandelbrot(double x, double y) {
+unsigned int inMandelbrot(double x, double y, int max_iterations) {
     int iteration = 0;
     double Re = 0;
     double Im = 0;
-    constexpr int max_iterations = 80;
     while (rSq(Re, Im) <= 4 && iteration < max_iterations) {
         double Re_temp = Re * Re - Im * Im + x;
         Im = 2 * Re * Im + y;
@@ -62,18 +61,14 @@ if(procid == 0){
     mkfifo(req.c_str(), 0777);
     mkfifo(resp.c_str(), 0777);
 
-    std::cout << "T: Opening req R" << std::endl;
     requestPipe = open(req.c_str(), O_RDONLY);
     if(requestPipe == -1){
         throw -1;
     }
-    std::cout << "T: Opened req R" << std::endl;
-    std::cout << "T: Opening resp W" << std::endl;
     responsePipe = open(resp.c_str(), O_WRONLY);
     if(responsePipe == -1) {
         throw -1;
     }
-    std::cout << "T: Opened resp W" << std::endl;
 
 }
 bool condition = true;
@@ -81,39 +76,36 @@ while(condition) {
     Request request;
     int status;
     if (procid == 0) {
-        std::cout<< "0 read request"<< sizeof(request)<<std::endl;
         status = read(requestPipe, &request, sizeof(Request));
-        std::cout<<procid<<" "<<status<<std::endl;
         if(status == -1){
             throw -1;
         }
-        std::cout<<"0 request readed \n"<< request.windowHeight<< " " << request.windowWidth<<std::endl;
     }
     MPI_Bcast(&request, sizeof(Request),MPI_CHAR,0,MPI_COMM_WORLD);
-    std::cout<<procid << " received broadcast\n";
     int width = request.windowWidth;
     int hight = request.windowHeight;
     condition = request.connectionOk;
     if(!condition)
         continue;
-    std::cout<< procid<< " "<< width << " " << hight<<std::endl;
-    // whole picture is in rectangle between {-2,1} and {1,-1}
     std::pair<double, double> start = {request.leftTopX, request.leftTopY};
     std::pair<double, double> end = {request.rightBottomX, request.rightBottomY};
     std::vector<char> result;
-    if (procid != 0) {
+    double surface = (end.first - start.first)*(start.second-end.second);
 
+    int iterations = 300/sqrt(surface);
+    if(iterations>2000)
+        iterations = 2000;
+    if (procid != 0) {
         for (int y = procid - 1; y < hight; y += (numprocs - 1)) {
-            //std::vector<RGB> line(width);
             char line[width * 3];
             for (int x = 0; x < width; x++) {
                 double x_val = (1.0 * x / width) * (end.first - start.first) + start.first;
-                double y_val = (1.0 * y / hight) * (end.second - start.second) + start.second;
-                colors::RGB rgb = colors::RGBColor(inMandelbrot(x_val, y_val), 80);
+                double y_val = (1.0 * y / hight) * (start.second - end.second ) + end.second;
+
+                colors::RGB rgb = colors::RGBColor(inMandelbrot(x_val, y_val, iterations), iterations);
                 line[x * 3] = rgb.R;
                 line[x * 3 + 1] = rgb.G;
                 line[x * 3 + 2] = rgb.B;
-
             }
             MPI_Send(line, width * 3, MPI_CHAR, 0, 0, MPI_COMM_WORLD);
         }
@@ -123,19 +115,8 @@ while(condition) {
             MPI_Status status;
             MPI_Recv(&line, width * 3, MPI_CHAR, y % (numprocs - 1) + 1, 0, MPI_COMM_WORLD, &status);
             result.insert(std::end(result), line, line + width * 3);
-
         }
-        //std::ofstream plot("data.ppm");
-
         write(responsePipe,result.data(),result.size() );
-
-        //plot << "P6" << std::endl;
-        //plot << width << " " << hight << std::endl;
-        //plot << "255" << std::endl;
-
-        //for (const auto &a:result)
-        //    plot << a;
-        //plot.close();
     }
 }
     MPI_Finalize();
