@@ -13,8 +13,8 @@ struct ApplicationState {
     bool requestImage = true;
     bool remapCoordinates = false;
     bool keyDown = false;
-    int windowHeight = 480;
-    int windowWidth = 640;
+    int windowHeight = 600;
+    int windowWidth = 720;
     double leftTopX = -2;
     double leftTopY = 1.5;
     double rightBottomX = 0.5;

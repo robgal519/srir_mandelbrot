@@ -164,7 +164,10 @@ void Application::handleEvents() {
             case SDL_MOUSEMOTION:
                 applicationState.secondMouseClick = std::make_pair(
                         event.button.x,
-                        event.button.y
+                        (event.button.x * 1.0 - applicationState.firstMouseClick.first) *
+                        applicationState.windowHeight / applicationState.windowWidth +
+                        applicationState.firstMouseClick.second
+
                 );
                 break;
             case SDL_MOUSEBUTTONDOWN:
@@ -174,18 +177,17 @@ void Application::handleEvents() {
                 }
                 if (event.button.button == SDL_BUTTON_RIGHT) {
                     std::cout << "lC size pop: " << lifoCoordinates.size() << std::endl;
-                    if(lifoCoordinates.empty()){
+                    if (lifoCoordinates.empty()) {
                         ApplicationState defaultState;
                         applicationState.leftTopX = defaultState.leftTopX;
                         applicationState.leftTopY = defaultState.leftTopY;
-                        applicationState.rightBottomX = defaultState.rightBottomX ;
+                        applicationState.rightBottomX = defaultState.rightBottomX;
                         applicationState.rightBottomY = defaultState.rightBottomY;
-                    }
-                    else{
+                    } else {
                         auto previousState = lifoCoordinates.top();
                         applicationState.leftTopX = previousState.leftTopX;
                         applicationState.leftTopY = previousState.leftTopY;
-                        applicationState.rightBottomX = previousState.rightBottomX ;
+                        applicationState.rightBottomX = previousState.rightBottomX;
                         applicationState.rightBottomY = previousState.rightBottomY;
                         lifoCoordinates.pop();
                     }
