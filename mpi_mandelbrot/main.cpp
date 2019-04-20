@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2019 AGH FiIS
  */
-
+#include <chrono>
 #include <iostream>
 #include <thread>
 #include <cmath>
@@ -56,6 +56,8 @@ int main(int argc, char *argv[]) {
     std::string resp = "/tmp/.resp";
     int requestPipe;
     int responsePipe;
+    std::chrono::time_point<std::chrono::steady_clock> begin_time;
+
 //////////////////////////////////
 if(procid == 0){
     mkfifo(req.c_str(), 0777);
@@ -78,6 +80,7 @@ while(condition) {
     if (procid == 0) {
         std::cout << "Master: Reading request.." << std::endl;
         status = read(requestPipe, &request, sizeof(Request));
+        begin_time = std::chrono::steady_clock::now();
         if(status == -1){
             std::cout << "Master: Reading request failed. Errno: " << errno << std::endl;
             throw -1;
@@ -127,6 +130,8 @@ while(condition) {
             result.insert(std::end(result), line, line + width * 3);
         }
         std::cout << "Master: Sending response.." << std::endl;
+        std::chrono::duration<double> diff = std::chrono::steady_clock::now() - begin_time;
+        std::cout << "calculations took "<< (diff.count())<<" s"<<std::endl;
         status = write(responsePipe,result.data(),result.size() );
         if(status == -1){
             std::cout << "Master: Sending response failed. Errno: " << status << std::endl;
