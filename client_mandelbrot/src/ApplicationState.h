@@ -6,12 +6,12 @@
 #define MANDELBROTCLIENT_APPLICATIONSTATE_H
 
 
-#include "Pixel.h"
 #include <utility>
 
 struct ApplicationState {
     bool running = true;
     bool requestImage = true;
+    bool remapCoordinates = false;
     bool keyDown = false;
     int windowHeight = 480;
     int windowWidth = 640;

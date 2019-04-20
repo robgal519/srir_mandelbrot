@@ -9,46 +9,31 @@ WindowToComplexPlaneMapper::WindowToComplexPlaneMapper(ApplicationState &state)
         : applicationState(state) {}
 
 void WindowToComplexPlaneMapper::remapCoordinates() {
+    if(!applicationState.remapCoordinates) return;
+    applicationState.remapCoordinates = false;
+
     double oldLeftTopX = applicationState.leftTopX;
     double oldLeftTopY = applicationState.leftTopY;
     double oldRightBottomX = applicationState.rightBottomX;
     double oldRightBottomY = applicationState.rightBottomY;
 
-    int mostTopLeftX, mostRightBottomX, mostRightBottomY, mostTopLeftY;
-    if(applicationState.firstMouseClick.first < applicationState.secondMouseClick.first){
-        mostTopLeftX = applicationState.firstMouseClick.first;
-        mostRightBottomX = applicationState.secondMouseClick.first;
-    }
-    else {
-        mostTopLeftX = applicationState.secondMouseClick.first;
-        mostRightBottomX = applicationState.firstMouseClick.first;
-    }
 
-    if(applicationState.firstMouseClick.second < applicationState.secondMouseClick.second){
-        mostRightBottomY = applicationState.firstMouseClick.second;
-        mostTopLeftY = applicationState.secondMouseClick.second;
-    }
-    else {
-        mostRightBottomY = applicationState.secondMouseClick.second;
-        mostTopLeftY = applicationState.firstMouseClick.second;
-    }
-
-    applicationState.leftTopX = calculateNewPosition(mostTopLeftX,
+    applicationState.leftTopX = calculateNewPosition(applicationState.firstMouseClick.first,
                                                      oldLeftTopX,
                                                      oldRightBottomX,
                                                      applicationState.windowWidth);
 
-    applicationState.leftTopY = calculateNewPosition(mostTopLeftY,
+    applicationState.leftTopY = calculateNewPosition(applicationState.firstMouseClick.second,
                                                      oldRightBottomY,
                                                      oldLeftTopY,
                                                      applicationState.windowHeight);
 
-    applicationState.rightBottomX = calculateNewPosition(mostRightBottomX,
+    applicationState.rightBottomX = calculateNewPosition(applicationState.secondMouseClick.first,
                                                          oldLeftTopX,
                                                          oldRightBottomX,
                                                          applicationState.windowWidth);
 
-    applicationState.rightBottomY = calculateNewPosition(mostRightBottomY,
+    applicationState.rightBottomY = calculateNewPosition(applicationState.secondMouseClick.second,
                                                          oldRightBottomY,
                                                          oldLeftTopY,
                                                          applicationState.windowHeight);

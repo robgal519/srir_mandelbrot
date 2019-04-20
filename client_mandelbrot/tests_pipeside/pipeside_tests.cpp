@@ -2,7 +2,10 @@
 // Created by glaeqen on 06/04/19.
 //
 #include <DataRequestNamedPipe.h>
+#include <Pixel.h>
 
+
+void generateImage(Request request, Pixel *imageToBeGenerated);
 
 void testingFunction (){
     std::string req = "/tmp/.req";
@@ -47,6 +50,7 @@ void testingFunction (){
         std::cout << "T: right_bottom_x = " << request.rightBottomX << std::endl;
         std::cout << "T: right_bottom_y = " << request.rightBottomY << std::endl;
         std::cout << "T: Sending response.." << std::endl;
+
         Pixel color {0, 0, 0xff};
         for(int i=0; i<request.windowHeight*request.windowWidth; i++){
             status = write(responsePipe, &color, sizeof(color));
@@ -57,6 +61,12 @@ void testingFunction (){
         responses++;
         std::cout << "T: Response " << responses << " sent." << std::endl;
     }
+}
+
+void generateImage(Request request, Pixel *imageToBeGenerated) {
+    Pixel black = {0, 0, 0};
+    Pixel white = {0xff, 0xff, 0xff};
+
 }
 
 int main(){

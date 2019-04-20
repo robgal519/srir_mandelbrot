@@ -12,7 +12,6 @@
 #include "ApplicationState.h"
 #include "DataRequestNamedPipe.h"
 #include "DataResponseNamedPipe.h"
-#include "Pixel.h"
 
 class Application {
 
@@ -27,6 +26,8 @@ public:
 
     void handleEvents();
 
+    void remapCoordinates();
+
     void handlePipes();
 
     void render();
@@ -39,6 +40,8 @@ private:
     SDL_Window *window;
     SDL_Renderer *renderer;
     SDL_Texture *texture;
+
+    double static calculateNewPosition(int mouseCoord, double smallerCoordEdge, double biggerCoordEdge, int screenSize);
 };
 
 

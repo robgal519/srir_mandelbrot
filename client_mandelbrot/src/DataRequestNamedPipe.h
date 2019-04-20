@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Exception.h"
-#include "Pixel.h"
 #include <string>
 #include <sys/stat.h>
 #include <unistd.h>

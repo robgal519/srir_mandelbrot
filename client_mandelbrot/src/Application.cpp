@@ -67,18 +67,53 @@ Application::~Application() noexcept {
 void Application::start() {
     while (applicationState.running) {
         handleEvents();
+        remapCoordinates();
         handlePipes();
         render();
     }
 
 }
 
+void Application::remapCoordinates() {
+    if(!applicationState.remapCoordinates) return;
+    applicationState.remapCoordinates = false;
+
+    double oldLeftTopX = applicationState.leftTopX;
+    double oldLeftTopY = applicationState.leftTopY;
+    double oldRightBottomX = applicationState.rightBottomX;
+    double oldRightBottomY = applicationState.rightBottomY;
+
+
+    applicationState.leftTopX = calculateNewPosition(applicationState.firstMouseClick.first,
+                                                     oldLeftTopX,
+                                                     oldRightBottomX,
+                                                     applicationState.windowWidth);
+
+    applicationState.leftTopY = calculateNewPosition(applicationState.firstMouseClick.second,
+                                                     oldRightBottomY,
+                                                     oldLeftTopY,
+                                                     applicationState.windowHeight);
+
+    applicationState.rightBottomX = calculateNewPosition(applicationState.secondMouseClick.first,
+                                                         oldLeftTopX,
+                                                         oldRightBottomX,
+                                                         applicationState.windowWidth);
+
+    applicationState.rightBottomY = calculateNewPosition(applicationState.secondMouseClick.second,
+                                                         oldRightBottomY,
+                                                         oldLeftTopY,
+                                                         applicationState.windowHeight);
+
+}
+
+double Application::calculateNewPosition(int mouseCoord, double smallerCoordEdge, double biggerCoordEdge,
+                                                        int screenSize) {
+    return (1.0 * mouseCoord / screenSize) * (biggerCoordEdge - smallerCoordEdge) + smallerCoordEdge;
+}
+
 void Application::handlePipes() {
     if (!applicationState.requestImage) return;
     applicationState.requestImage = false;
-
-    WindowToComplexPlaneMapper mapper(applicationState);
-    mapper.remapCoordinates();
 
     Request imageRequest{
             applicationState.running,
@@ -91,7 +126,7 @@ void Application::handlePipes() {
     };
 
     requestImagePipe.sendRequest(imageRequest);
-    if(!applicationState.running) return;
+    if (!applicationState.running) return;
     responseImagePipe.readResponse(currentImage, applicationState.windowWidth, applicationState.windowHeight);
 }
 
@@ -104,13 +139,18 @@ void Application::handleEvents() {
                 applicationState.requestImage = true;
                 break;
             case SDL_WINDOWEVENT:
-                if(event.window.event != SDL_WINDOWEVENT_SIZE_CHANGED) break;
+                if (event.window.event != SDL_WINDOWEVENT_SIZE_CHANGED) break;
                 applicationState.windowWidth = event.window.data1;
                 applicationState.windowHeight = event.window.data2;
                 applicationState.requestImage = true;
                 break;
             case SDL_MOUSEMOTION:
-                applicationState.secondMouseClick = std::make_pair(event.button.x, event.button.y);
+                applicationState.secondMouseClick = std::make_pair(
+                        event.button.x,
+                        (event.button.x * 1.0 - applicationState.firstMouseClick.first) *
+                        applicationState.windowHeight / applicationState.windowWidth +
+                        applicationState.firstMouseClick.second
+                );
                 break;
             case SDL_MOUSEBUTTONDOWN:
                 if (event.button.button != SDL_BUTTON_LEFT) break;
@@ -119,8 +159,8 @@ void Application::handleEvents() {
                 break;
             case SDL_MOUSEBUTTONUP:
                 if (event.button.button != SDL_BUTTON_LEFT) break;
-                applicationState.secondMouseClick = std::make_pair(event.button.x, event.button.y);
                 applicationState.keyDown = false;
+                applicationState.remapCoordinates = true;
                 applicationState.requestImage = true;
                 break;
         }
