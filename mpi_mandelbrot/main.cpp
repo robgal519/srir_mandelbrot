@@ -110,7 +110,7 @@ while(condition) {
             char line[width * 3];
             for (int x = 0; x < width; x++) {
                 double x_val = (1.0 * x / width) * (end.first - start.first) + start.first;
-                double y_val = (1.0 * y / hight) * (start.second - end.second ) + end.second;
+                double y_val = start.second - (1.0 * y / hight) * (start.second - end.second );
 
                 colors::RGB rgb = colors::RGBColor(inMandelbrot(x_val, y_val, iterations), iterations);
                 line[x * 3] = rgb.R;
