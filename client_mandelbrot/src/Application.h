@@ -9,6 +9,7 @@
 #include <SDL2/SDL.h>
 #include <string>
 #include <vector>
+#include <stack>
 #include "ApplicationState.h"
 #include "DataRequestNamedPipe.h"
 #include "DataResponseNamedPipe.h"
@@ -37,11 +38,10 @@ private:
     DataResponseNamedPipe responseImagePipe;
     ApplicationState applicationState;
     std::vector<Pixel> currentImage;
+    std::stack<ApplicationState> lifoCoordinates;
     SDL_Window *window;
     SDL_Renderer *renderer;
     SDL_Texture *texture;
-
-    double static calculateNewPosition(int mouseCoord, double smallerCoordEdge, double biggerCoordEdge, int screenSize);
 };
 
 

@@ -5,7 +5,6 @@
 #include <SDL2/SDL.h>
 #include "Application.h"
 #include "Exception.h"
-#include "WindowToComplexPlaneMapper.h"
 #include <exception>
 
 struct WindowOpeningFailedException : Exception {
@@ -75,7 +74,7 @@ void Application::start() {
 }
 
 void Application::remapCoordinates() {
-    if(!applicationState.remapCoordinates) return;
+    if (!applicationState.remapCoordinates) return;
     applicationState.remapCoordinates = false;
 
     double oldLeftTopX = applicationState.leftTopX;
@@ -83,32 +82,41 @@ void Application::remapCoordinates() {
     double oldRightBottomX = applicationState.rightBottomX;
     double oldRightBottomY = applicationState.rightBottomY;
 
+    std::cout << "oldLeftTopX: " << oldLeftTopX << std::endl;
+    std::cout << "oldRightBottomX: " << oldRightBottomX << std::endl;
+    std::cout << "oldRightBottomY: " << oldRightBottomY << std::endl;
+    std::cout << "oldLeftTopY: " << oldLeftTopY << std::endl;
+    std::cout << "Recalculating leftTopX.." << std::endl;
+    std::cout << oldLeftTopX << " + (" << oldRightBottomX << " - " << oldLeftTopX << ") * (";
+    std::cout << applicationState.firstMouseClick.first << " / " << applicationState.windowWidth << ")";
+    applicationState.leftTopX = oldLeftTopX + (oldRightBottomX - oldLeftTopX) *
+                                              (1.0 * applicationState.firstMouseClick.first /
+                                               applicationState.windowWidth);
+    std::cout << " = " << applicationState.leftTopX << std::endl;
 
-    applicationState.leftTopX = calculateNewPosition(applicationState.firstMouseClick.first,
-                                                     oldLeftTopX,
-                                                     oldRightBottomX,
-                                                     applicationState.windowWidth);
+    std::cout << "Recalculating rightBottomX.." << std::endl;
+    std::cout << oldLeftTopX << " + (" << oldRightBottomX << " - " << oldLeftTopX << ") * (";
+    std::cout << applicationState.secondMouseClick.first << " / " << applicationState.windowWidth << ")";
+    applicationState.rightBottomX = oldLeftTopX + (oldRightBottomX - oldLeftTopX) *
+                                                  (1.0 * applicationState.secondMouseClick.first /
+                                                   applicationState.windowWidth);
+    std::cout << " = " << applicationState.rightBottomX << std::endl;
 
-    applicationState.leftTopY = calculateNewPosition(applicationState.firstMouseClick.second,
-                                                     oldRightBottomY,
-                                                     oldLeftTopY,
-                                                     applicationState.windowHeight);
+    std::cout << "Recalculating rightBottomY.." << std::endl;
+    std::cout << oldLeftTopY << " - (" << oldLeftTopY << " - " << oldRightBottomY << ") * (";
+    std::cout << applicationState.secondMouseClick.second << " / " << applicationState.windowHeight << ")";
+    applicationState.rightBottomY = oldLeftTopY - (oldLeftTopY - oldRightBottomY) *
+                                                  (1.0 * applicationState.secondMouseClick.second /
+                                                   applicationState.windowHeight);
+    std::cout << " = " << applicationState.rightBottomY << std::endl;
 
-    applicationState.rightBottomX = calculateNewPosition(applicationState.secondMouseClick.first,
-                                                         oldLeftTopX,
-                                                         oldRightBottomX,
-                                                         applicationState.windowWidth);
-
-    applicationState.rightBottomY = calculateNewPosition(applicationState.secondMouseClick.second,
-                                                         oldRightBottomY,
-                                                         oldLeftTopY,
-                                                         applicationState.windowHeight);
-
-}
-
-double Application::calculateNewPosition(int mouseCoord, double smallerCoordEdge, double biggerCoordEdge,
-                                                        int screenSize) {
-    return (1.0 * mouseCoord / screenSize) * (biggerCoordEdge - smallerCoordEdge) + smallerCoordEdge;
+    std::cout << "Recalculating leftTopY.." << std::endl;
+    std::cout << oldLeftTopY << " - (" << oldLeftTopY << " - " << oldRightBottomY << ") * (";
+    std::cout << applicationState.firstMouseClick.second << " / " << applicationState.windowHeight << ")";
+    applicationState.leftTopY = oldLeftTopY - (oldLeftTopY - oldRightBottomY) *
+                                              (1.0 * applicationState.firstMouseClick.second /
+                                               applicationState.windowHeight);
+    std::cout << " = " << applicationState.leftTopY << std::endl;
 }
 
 void Application::handlePipes() {
@@ -142,24 +150,53 @@ void Application::handleEvents() {
                 if (event.window.event != SDL_WINDOWEVENT_SIZE_CHANGED) break;
                 applicationState.windowWidth = event.window.data1;
                 applicationState.windowHeight = event.window.data2;
+                currentImage.resize(applicationState.windowWidth * applicationState.windowHeight);
+                SDL_DestroyTexture(texture);
+                texture = SDL_CreateTexture(
+                        renderer,
+                        SDL_PIXELFORMAT_RGB24,
+                        SDL_TEXTUREACCESS_STREAMING,
+                        applicationState.windowWidth,
+                        applicationState.windowHeight
+                );
                 applicationState.requestImage = true;
                 break;
             case SDL_MOUSEMOTION:
                 applicationState.secondMouseClick = std::make_pair(
                         event.button.x,
-                        (event.button.x * 1.0 - applicationState.firstMouseClick.first) *
-                        applicationState.windowHeight / applicationState.windowWidth +
-                        applicationState.firstMouseClick.second
+                        event.button.y
                 );
                 break;
             case SDL_MOUSEBUTTONDOWN:
-                if (event.button.button != SDL_BUTTON_LEFT) break;
-                applicationState.firstMouseClick = std::make_pair(event.button.x, event.button.y);
-                applicationState.keyDown = true;
+                if (event.button.button == SDL_BUTTON_LEFT) {
+                    applicationState.firstMouseClick = std::make_pair(event.button.x, event.button.y);
+                    applicationState.keyDown = true;
+                }
+                if (event.button.button == SDL_BUTTON_RIGHT) {
+                    std::cout << "lC size pop: " << lifoCoordinates.size() << std::endl;
+                    if(lifoCoordinates.empty()){
+                        ApplicationState defaultState;
+                        applicationState.leftTopX = defaultState.leftTopX;
+                        applicationState.leftTopY = defaultState.leftTopY;
+                        applicationState.rightBottomX = defaultState.rightBottomX ;
+                        applicationState.rightBottomY = defaultState.rightBottomY;
+                    }
+                    else{
+                        auto previousState = lifoCoordinates.top();
+                        applicationState.leftTopX = previousState.leftTopX;
+                        applicationState.leftTopY = previousState.leftTopY;
+                        applicationState.rightBottomX = previousState.rightBottomX ;
+                        applicationState.rightBottomY = previousState.rightBottomY;
+                        lifoCoordinates.pop();
+                    }
+                    applicationState.requestImage = true;
+                }
                 break;
             case SDL_MOUSEBUTTONUP:
                 if (event.button.button != SDL_BUTTON_LEFT) break;
                 applicationState.keyDown = false;
+                lifoCoordinates.push(applicationState);
+                std::cout << "lC size++: " << lifoCoordinates.size() << std::endl;
                 applicationState.remapCoordinates = true;
                 applicationState.requestImage = true;
                 break;
