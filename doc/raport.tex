@@ -1,0 +1,53 @@
+\documentclass[12pt,a4paper,notitlepage]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{polski}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage[T1]{fontenc}
+\usepackage[top=2cm, bottom=2cm, left=3cm, right=3cm]{geometry}
+\usepackage{float}
+\usepackage{cite}
+\usepackage[hidelinks]{hyperref}
+\usepackage{minted}
+\usepackage{subcaption}
+\usepackage[defaultlines=4,all]{nowidow}
+
+\makeatletter
+\newcommand{\linia}{\rule{\linewidth}{0.4mm}}
+\renewcommand{\maketitle}{\begin{titlepage}
+    \vspace*{1cm}
+    \begin{center}\small
+    Akademia Górniczo -- Hutnicza\\
+    Wydział Fizyki i Informatyki Stosowanej
+    \end{center}
+    \vspace{3cm}
+    \noindent\linia
+    \begin{center}
+      \LARGE \textsc{\@title}
+         \end{center}
+     \linia
+    \vspace{0.5cm}
+    \begin{flushright}
+    \begin{minipage}{5cm}
+    \textit{\small Autorzy:}\\
+    \normalsize \textsc{\@author} \par
+    \end{minipage}
+    \vspace{5cm}
+     \end{flushright}
+    \vspace*{\stretch{6}}
+    \begin{center}
+    \@date
+    \end{center}
+  \end{titlepage}%
+}
+\makeatother
+\author{Robert Gałat \newline Gabriel Górski}
+\title{Wizualizacja Zbioru Mandelbrota}
+\begin{document}
+\maketitle
+
+\input{Introduction}
+\input{Conclusion}
+\bibliography{references}
+\bibliographystyle{plain}
+\end{document}
