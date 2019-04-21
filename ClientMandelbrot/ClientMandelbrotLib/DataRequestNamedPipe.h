@@ -20,11 +20,11 @@ struct Request {
 class DataRequestNamedPipe {
 public:
     virtual ~DataRequestNamedPipe() {
-        std::cout << "Client: // Request // Closing named pipe " << path << std::endl;
+        std::cout << "Client: // Request  // Closing named pipe " << path << std::endl;
         close(fileDescriptor);
-        std::cout << "Client: // Request // Closed named pipe " << path << std::endl;
+        std::cout << "Client: // Request  // Closed named pipe " << path << std::endl;
         unlink(path.c_str());
-        std::cout << "Client: // Request // Removing FIFO inode " << path << std::endl;
+        std::cout << "Client: // Request  // Removing FIFO inode " << path << std::endl;
     }
 
     explicit DataRequestNamedPipe(const std::string &path): path(path) {
