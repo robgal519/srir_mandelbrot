@@ -1,10 +1,4 @@
-//
-// Created by glaeqen on 06/04/19.
-//
-
-#ifndef MANDELBROTCLIENT_APPLICATIONSTATE_H
-#define MANDELBROTCLIENT_APPLICATIONSTATE_H
-
+#pragma once
 
 #include <utility>
 
@@ -23,5 +17,3 @@ struct ApplicationState {
     std::pair<int, int> secondMouseClick = {windowWidth, windowHeight};
 };
 
-
-#endif //MANDELBROTCLIENT_APPLICATIONSTATE_H
