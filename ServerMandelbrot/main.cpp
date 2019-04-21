@@ -76,20 +76,20 @@ while(condition) {
     Request request;
     int status;
     if (procid == 0) {
-        std::cout << "Master: Reading request.." << std::endl;
+        std::cout << "Server: Reading request.." << std::endl;
         status = read(requestPipe, &request, sizeof(Request));
         if(status == -1){
-            std::cout << "Master: Reading request failed. Errno: " << errno << std::endl;
+            std::cout << "Server: Reading request failed. Errno: " << errno << std::endl;
             throw -1;
         }
-        std::cout << "Master: Request read successfully" << std::endl;
-        std::cout << "Master: connectionOk: " << request.connectionOk << std::endl;
-        std::cout << "Master: windowHeight: " << request.windowHeight << std::endl;
-        std::cout << "Master: windowWidth: " << request.windowWidth << std::endl;
-        std::cout << "Master: leftTopX: " << request.leftTopX << std::endl;
-        std::cout << "Master: leftTopY: " << request.leftTopY << std::endl;
-        std::cout << "Master: rightBottomX: " << request.rightBottomX << std::endl;
-        std::cout << "Master: rightBottomY: " << request.rightBottomY << std::endl;
+        std::cout << "Server: Request read successfully" << std::endl;
+        std::cout << "Server: connectionOk: " << request.connectionOk << std::endl;
+        std::cout << "Server: windowHeight: " << request.windowHeight << std::endl;
+        std::cout << "Server: windowWidth: " << request.windowWidth << std::endl;
+        std::cout << "Server: leftTopX: " << request.leftTopX << std::endl;
+        std::cout << "Server: leftTopY: " << request.leftTopY << std::endl;
+        std::cout << "Server: rightBottomX: " << request.rightBottomX << std::endl;
+        std::cout << "Server: rightBottomY: " << request.rightBottomY << std::endl;
     }
     MPI_Bcast(&request, sizeof(Request),MPI_CHAR,0,MPI_COMM_WORLD);
     int width = request.windowWidth;
@@ -126,13 +126,13 @@ while(condition) {
             MPI_Recv(&line, width * 3, MPI_CHAR, y % (numprocs - 1) + 1, 0, MPI_COMM_WORLD, &status);
             result.insert(std::end(result), line, line + width * 3);
         }
-        std::cout << "Master: Sending response.." << std::endl;
+        std::cout << "Server: Sending response.." << std::endl;
         status = write(responsePipe,result.data(),result.size() );
         if(status == -1){
-            std::cout << "Master: Sending response failed. Errno: " << status << std::endl;
+            std::cout << "Server: Sending response failed. Errno: " << status << std::endl;
             throw -1;
         }
-        std::cout << "Master: Response sent successfully. Amount of bytes sent: " << status << std::endl;
+        std::cout << "Server: Response sent successfully. Amount of bytes sent: " << status << std::endl;
     }
 }
     MPI_Finalize();

@@ -1,11 +1,10 @@
-//
-// Created by glaeqen on 06/04/19.
-//
+#include "Application.h"
+
+#include "Exception.h"
 
 #include <SDL2/SDL.h>
-#include "Application.h"
-#include "Exception.h"
 #include <exception>
+
 
 struct WindowOpeningFailedException : Exception {
     WindowOpeningFailedException(const std::string &message) : Exception(message) {}
@@ -82,41 +81,18 @@ void Application::remapCoordinates() {
     double oldRightBottomX = applicationState.rightBottomX;
     double oldRightBottomY = applicationState.rightBottomY;
 
-    std::cout << "oldLeftTopX: " << oldLeftTopX << std::endl;
-    std::cout << "oldRightBottomX: " << oldRightBottomX << std::endl;
-    std::cout << "oldRightBottomY: " << oldRightBottomY << std::endl;
-    std::cout << "oldLeftTopY: " << oldLeftTopY << std::endl;
-    std::cout << "Recalculating leftTopX.." << std::endl;
-    std::cout << oldLeftTopX << " + (" << oldRightBottomX << " - " << oldLeftTopX << ") * (";
-    std::cout << applicationState.firstMouseClick.first << " / " << applicationState.windowWidth << ")";
     applicationState.leftTopX = oldLeftTopX + (oldRightBottomX - oldLeftTopX) *
                                               (1.0 * applicationState.firstMouseClick.first /
                                                applicationState.windowWidth);
-    std::cout << " = " << applicationState.leftTopX << std::endl;
-
-    std::cout << "Recalculating rightBottomX.." << std::endl;
-    std::cout << oldLeftTopX << " + (" << oldRightBottomX << " - " << oldLeftTopX << ") * (";
-    std::cout << applicationState.secondMouseClick.first << " / " << applicationState.windowWidth << ")";
     applicationState.rightBottomX = oldLeftTopX + (oldRightBottomX - oldLeftTopX) *
                                                   (1.0 * applicationState.secondMouseClick.first /
                                                    applicationState.windowWidth);
-    std::cout << " = " << applicationState.rightBottomX << std::endl;
-
-    std::cout << "Recalculating rightBottomY.." << std::endl;
-    std::cout << oldLeftTopY << " - (" << oldLeftTopY << " - " << oldRightBottomY << ") * (";
-    std::cout << applicationState.secondMouseClick.second << " / " << applicationState.windowHeight << ")";
     applicationState.rightBottomY = oldLeftTopY - (oldLeftTopY - oldRightBottomY) *
                                                   (1.0 * applicationState.secondMouseClick.second /
                                                    applicationState.windowHeight);
-    std::cout << " = " << applicationState.rightBottomY << std::endl;
-
-    std::cout << "Recalculating leftTopY.." << std::endl;
-    std::cout << oldLeftTopY << " - (" << oldLeftTopY << " - " << oldRightBottomY << ") * (";
-    std::cout << applicationState.firstMouseClick.second << " / " << applicationState.windowHeight << ")";
     applicationState.leftTopY = oldLeftTopY - (oldLeftTopY - oldRightBottomY) *
                                               (1.0 * applicationState.firstMouseClick.second /
                                                applicationState.windowHeight);
-    std::cout << " = " << applicationState.leftTopY << std::endl;
 }
 
 void Application::handlePipes() {
@@ -176,7 +152,6 @@ void Application::handleEvents() {
                     applicationState.keyDown = true;
                 }
                 if (event.button.button == SDL_BUTTON_RIGHT) {
-                    std::cout << "lC size pop: " << lifoCoordinates.size() << std::endl;
                     if (lifoCoordinates.empty()) {
                         ApplicationState defaultState;
                         applicationState.leftTopX = defaultState.leftTopX;
@@ -198,7 +173,6 @@ void Application::handleEvents() {
                 if (event.button.button != SDL_BUTTON_LEFT) break;
                 applicationState.keyDown = false;
                 lifoCoordinates.push(applicationState);
-                std::cout << "lC size++: " << lifoCoordinates.size() << std::endl;
                 applicationState.remapCoordinates = true;
                 applicationState.requestImage = true;
                 break;
@@ -219,7 +193,7 @@ void Application::render() {
 
     SDL_RenderCopy(renderer, texture, nullptr, nullptr);
     if (applicationState.keyDown) {
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
+        SDL_SetRenderDrawColor(renderer, 0, 0, 255, SDL_ALPHA_OPAQUE);
         SDL_Rect outline{applicationState.firstMouseClick.first,
                          applicationState.secondMouseClick.second,
                          applicationState.secondMouseClick.first - applicationState.firstMouseClick.first,

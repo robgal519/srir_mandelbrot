@@ -24,6 +24,15 @@ SERVER_LFLAGS := $(MPI_LFLAGS)
 
 all: client server
 
+run_local: all
+	@rm -f /tmp/.req /tmp/.resp
+	@echo Starting Client in background..
+	./$(TARGET_DIR)/$(CLIENT_EXEC) &
+	@echo Started Client.
+	@echo Starting Server in background..
+	mpiexec -n $(shell nproc) ./$(TARGET_DIR)/$(SERVER_EXEC) &
+	@echo Started Server. Nproc count $(shell nproc)
+
 client: $(TARGET_DIR)/$(CLIENT_EXEC)
 
 server: $(TARGET_DIR)/$(SERVER_EXEC)
@@ -39,7 +48,7 @@ $(TARGET_DIR)/$(SERVER_EXEC): $(SERVER_OBJS)
 	@mkdir -p $(dir $@)
 	$(MPICC) $^ -o $@ $(SERVER_LFLAGS)
 
-# Variable substitution is BROKEN ! Couldn't figure out how they work.
+# Variable substitution is BROKEN ! Couldn't figure out how it works.
 # $(BUILD_DIR)/$(CLIENT_EXEC)/%.o:$(CLIENT_EXEC)/%.cpp
 build/ClientMandelbrot/%.o:ClientMandelbrot/%.cpp
 	@mkdir -p $(dir $@)

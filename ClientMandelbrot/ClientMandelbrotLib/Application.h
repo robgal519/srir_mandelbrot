@@ -1,10 +1,4 @@
-//
-// Created by glaeqen on 06/04/19.
-//
-
-#ifndef MANDELBROTCLIENT_APPLICATION_H
-#define MANDELBROTCLIENT_APPLICATION_H
-
+#pragma once
 
 #include <SDL2/SDL.h>
 #include <string>
@@ -44,5 +38,3 @@ private:
     SDL_Texture *texture;
 };
 
-
-#endif //MANDELBROTCLIENT_APPLICATION_H

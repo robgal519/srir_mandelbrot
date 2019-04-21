@@ -1,9 +1,4 @@
-//
-// Created by Glaeqen on 2019-04-10.
-//
-
-#ifndef MANDELBROTCLIENT_PIXEL_H
-#define MANDELBROTCLIENT_PIXEL_H
+#pragma once
 
 #include <cstdint>
 
@@ -13,4 +8,3 @@ struct Pixel{
     uint8_t blue;
 };
 
-#endif //MANDELBROTCLIENT_PIXEL_H

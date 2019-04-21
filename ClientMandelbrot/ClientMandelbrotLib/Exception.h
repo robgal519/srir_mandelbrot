@@ -1,9 +1,4 @@
-//
-// Created by glaeqen on 06/04/19.
-//
-
-#ifndef MANDELBROTCLIENT_EXCEPTION_H
-#define MANDELBROTCLIENT_EXCEPTION_H
+#pragma once
 
 #include <exception>
 #include <string>
@@ -27,5 +22,3 @@ struct CannotReadFromNamedPipeException : Exception {
     explicit CannotReadFromNamedPipeException(const std::string &message) : Exception(message) {}
 };
 
-
-#endif //MANDELBROTCLIENT_EXCEPTION_H

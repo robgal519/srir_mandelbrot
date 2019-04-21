@@ -1,7 +1,3 @@
-//
-// Created by glaeqen on 06/04/19.
-//
-
 #include "Exception.h"
 
 const char *Exception::what() const noexcept {
@@ -9,3 +5,4 @@ const char *Exception::what() const noexcept {
 }
 
 Exception::Exception(const std::string &message) : message(message) {};
+
