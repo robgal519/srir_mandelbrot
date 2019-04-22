@@ -81,17 +81,36 @@ void Application::remapCoordinates() {
     double oldRightBottomX = applicationState.rightBottomX;
     double oldRightBottomY = applicationState.rightBottomY;
 
+    int leftTopXMouse, rightBottomXMouse, leftTopYMouse, rightBottomYMouse;
+    if(applicationState.firstMouseClick.first < applicationState.secondMouseClick.first){
+        leftTopXMouse = applicationState.firstMouseClick.first;
+        rightBottomXMouse = applicationState.secondMouseClick.first;
+    }
+    else {
+        leftTopXMouse = applicationState.secondMouseClick.first;
+        rightBottomXMouse = applicationState.firstMouseClick.first;
+    }
+
+    if(applicationState.firstMouseClick.second < applicationState.secondMouseClick.second){
+        rightBottomYMouse = applicationState.secondMouseClick.second;
+        leftTopYMouse = applicationState.firstMouseClick.second;
+    }
+    else {
+        rightBottomYMouse = applicationState.firstMouseClick.second;
+        leftTopYMouse = applicationState.secondMouseClick.second;
+    }
+
     applicationState.leftTopX = oldLeftTopX + (oldRightBottomX - oldLeftTopX) *
-                                              (1.0 * applicationState.firstMouseClick.first /
+                                              (1.0 * leftTopXMouse /
                                                applicationState.windowWidth);
     applicationState.rightBottomX = oldLeftTopX + (oldRightBottomX - oldLeftTopX) *
-                                                  (1.0 * applicationState.secondMouseClick.first /
+                                                  (1.0 * rightBottomXMouse /
                                                    applicationState.windowWidth);
     applicationState.rightBottomY = oldLeftTopY - (oldLeftTopY - oldRightBottomY) *
-                                                  (1.0 * applicationState.secondMouseClick.second /
+                                                  (1.0 * rightBottomYMouse /
                                                    applicationState.windowHeight);
     applicationState.leftTopY = oldLeftTopY - (oldLeftTopY - oldRightBottomY) *
-                                              (1.0 * applicationState.firstMouseClick.second /
+                                              (1.0 * leftTopYMouse /
                                                applicationState.windowHeight);
 }
 

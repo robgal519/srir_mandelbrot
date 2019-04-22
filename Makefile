@@ -1,6 +1,6 @@
 CC := g++
 MPICC := mpicxx
-CFLAGS := -O2
+CFLAGS := -O2 --std=c++11
 
 SDL2_CFLAGS := $(shell pkg-config --cflags sdl2)
 SDL2_LFLAGS := $(shell pkg-config --libs sdl2)
