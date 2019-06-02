@@ -1,11 +1,12 @@
 CC := g++
-MPICC := mpicxx
 CFLAGS := -O2 --std=c++11
 
 SDL2_CFLAGS := $(shell pkg-config --cflags sdl2)
 SDL2_LFLAGS := $(shell pkg-config --libs sdl2)
-MPI_CFLAGS := $(shell pkg-config --cflags mpi)
-MPI_LFLAGS := $(shell pkg-config --libs mpi)
+UPCXX_CFLAGS := $(shell upcxx-meta CPPFLAGS)
+UPCXX_CFLAGS += $(shell upcxx-meta CXXFLAGS)
+UPCXX_LFLAGS := $(shell upcxx-meta LDFLAGS)
+UPCXX_LIBS := $(shell upcxx-meta LIBS)
 
 BUILD_DIR := build
 TARGET_DIR := target
@@ -19,8 +20,7 @@ CLIENT_LFLAGS := $(SDL2_LFLAGS)
 SERVER_EXEC := ServerMandelbrot # Also path
 SERVER_SRC := $(shell find $(SERVER_EXEC) -name *cpp)
 SERVER_OBJS := $(SERVER_SRC:%.cpp=$(BUILD_DIR)/%.o)
-SERVER_CFLAGS := $(CFLAGS) $(MPI_CFLAGS)
-SERVER_LFLAGS := $(MPI_LFLAGS)
+SERVER_CFLAGS := $(CFLAGS) $(UPCXX_CFLAGS)
 
 all: client server
 
@@ -30,7 +30,7 @@ run_local: all
 	./$(TARGET_DIR)/$(CLIENT_EXEC) &
 	@echo Started Client.
 	@echo Starting Server in background..
-	mpiexec -n $(shell nproc) ./$(TARGET_DIR)/$(SERVER_EXEC) &
+	upcxx-run -n $(shell nproc) ./$(TARGET_DIR)/$(SERVER_EXEC) &
 	@echo Started Server. Nproc count $(shell nproc)
 
 client: $(TARGET_DIR)/$(CLIENT_EXEC)
@@ -46,7 +46,7 @@ $(TARGET_DIR)/$(CLIENT_EXEC): $(CLIENT_OBJS)
 
 $(TARGET_DIR)/$(SERVER_EXEC): $(SERVER_OBJS)
 	@mkdir -p $(dir $@)
-	$(MPICC) $^ -o $@ $(SERVER_LFLAGS)
+	$(CC) $(UPCXX_LFLAGS) $^ -o $@ $(UPCXX_LIBS)
 
 # Variable substitution is BROKEN ! Couldn't figure out how it works.
 # $(BUILD_DIR)/$(CLIENT_EXEC)/%.o:$(CLIENT_EXEC)/%.cpp
@@ -57,6 +57,6 @@ build/ClientMandelbrot/%.o:ClientMandelbrot/%.cpp
 # $(BUILD_DIR)/$(SERVER_EXEC)/%.o:$(SERVER_EXEC)/%.cpp
 build/ServerMandelbrot/%.o:ServerMandelbrot/%.cpp
 	@mkdir -p $(dir $@)
-	$(MPICC) $(SERVER_CFLAGS) -c $< -o $@
+	$(CC) $(SERVER_CFLAGS) -c $< -o $@
 
 .PHONY: all client server clean

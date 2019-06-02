@@ -1,8 +1,20 @@
 cmake_minimum_required( VERSION 2.6)
 project (ServerMandelbrot)
 
-find_package(MPI REQUIRED)
+execute_process(COMMAND upcxx-meta CXXFLAGS
+  OUTPUT_VARIABLE UPCXX_CXXFLAGS)
+execute_process(COMMAND upcxx-meta CPPFLAGS
+  OUTPUT_VARIABLE UPCXX_CPPFLAGS)
+execute_process(COMMAND upcxx-meta LDFLAGS
+  OUTPUT_VARIABLE UPCXX_LDFLAGS)
+execute_process(COMMAND upcxx-meta LIBS
+  OUTPUT_VARIABLE UPCXX_LIBS)
+
+string(STRIP ${UPCXX_CXXFLAGS} UPCXX_CXXFLAGS)
+string(STRIP ${UPCXX_CPPFLAGS} UPCPP_CXXFLAGS)
+string(STRIP ${UPCXX_LDFLAGS} UPCXX_LDFLAGS)
+string(STRIP ${UPCXX_LIBS} UPCXX_LIBS)
 
 add_executable(ServerMandelbrot main.cpp)
-target_include_directories(ServerMandelbrot PUBLIC ${MPI_INCLUDE_PATH})
-target_link_libraries(ServerMandelbrot pthread ${MPI_LIBRARIES})
+
+set_target_properties(ServerMandelbrot PROPERTIES COMPILE_FLAGS ${UPCXX_CXXFLAGS} COMPILE_FLAGS ${UPCXX_CPPFLAGS} LINK_FLAGS ${UPCXX_LDFLAGS} LINK_LIBRARIES ${UPCXX_LIBS})
