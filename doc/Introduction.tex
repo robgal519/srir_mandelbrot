@@ -1,7 +1,7 @@
 \section{Budowa aplikacji}
 Prezentowana aplikacja zbudowana jest z 2 modułów:
 \begin{itemize}
-    \item Aplikacji obliczeniowej opartej o środowisko MPI (nazywana dla
+    \item Aplikacji obliczeniowej opartej o środowisko UPCXX (nazywana dla
     uproszczenia \textbf{serwerem})
     \item Aplikacja z interfejsem graficznym (nazywana dla uproszczenia
     \textbf{klientem})
@@ -126,7 +126,7 @@ oraz odpowiednią paletę kolorów poza zbiorem.
 \subsection{Wymagania}
 \begin{itemize}
     \item Biblioteka SDL2 (klient)
-    \item Środowisko MPI (serwer)
+    \item Środowisko UPCXX (serwer)
     \item System UNIX lub UNIXopodobny wspierający POSIX
     \item Serwer X
     \item Program pkg-config
@@ -134,19 +134,27 @@ oraz odpowiednią paletę kolorów poza zbiorem.
     \item Kompilator języka C++ kompatybilny ze standardem C++11 lub wyższym
 \end{itemize}
 
+We wszystkich poniższych punktach założono, że nakładki wykorzystywane w ramach
+projektu UPCXX (odpowiednio \textit{upcxx} oraz \textit{upcxx-run}) znajdują się
+w ścieżce przeszukiwań (zmienna środowiskowa \textbf{PATH}).
+
 \subsection{Kompilacja i konsolidacja}
-Proces kompilacji i uruchomienia jest zautomatyzowany poprzez system budowania Make lub CMake.
-Domyślnie używany jest kompilator i konsolidator dostarczany w ramach projektu GNU GCC.\\
+Proces kompilacji i uruchomienia jest zautomatyzowany poprzez system budowania
+Make lub CMake. Domyślnie używany jest kompilator i konsolidator dostarczany w
+ramach projektu GNU GCC. Aplikacja pracująca w kontekście UPCXX kompilowana i
+konsolidowana jest za pomocą nakładki \textit{upcxx} która wykorzystuje domyślny
+dla siebie kompilator.\\
 
 Dostarczone są dwa pliki Makefile
 \begin{itemize}
     \item [A] \textbf{Makefile} -- zakładający, że biblioteka SDL2 i środowisko
-    MPI jest na danej platformie zainstalowane. Odpowiednie ścieżki do nagłówków
-    i bibliotek znajdowane są poprzez program \textit{pkg-config}.
-    \item [B] \textbf{MakefileShippedSDL} -- korzystający z biblioteki dynamicznej i
-    nagłówków dostarczonych wraz z repozytorium kodu. Dostarczona biblioteka
-    zakłada wykorzystanie na platformie zaopatrzonej w dystrybucję Debian w
-    wersji Stretch. 
+    UPCXX jest na danej platformie zainstalowane. Odpowiednie ścieżki do
+    nagłówków i biblioteki SDL znajdowane są poprzez program
+    \textit{pkg-config}.
+    \item [B] \textbf{MakefileShippedSDL} -- korzystający z biblioteki
+    dynamicznej i nagłówków dostarczonych wraz z repozytorium kodu. Dostarczona
+    biblioteka zakłada wykorzystanie na platformie zaopatrzonej w dystrybucję
+    Debian w wersji Stretch.
 \end{itemize}
 
 Dostępne cele w ramach Make
@@ -155,8 +163,8 @@ Dostępne cele w ramach Make
     oraz target/ServerMandelbrot)
     \item \textbf{clean} -- wyczyść katalog repozytorium (usuwa target oraz build)
     \item \textbf{run\_local} -- Uruchamia kompletną aplikację: Startuje
-    równolegle klienta i serwer w środowisku MPI wykorzystując wszystkie rdzenie
-    fizyczne danej platformy.
+    równolegle klienta i serwer w środowisku UPCXX wykorzystując wszystkie
+    rdzenie fizyczne danej platformy.
 \end{itemize}
 
 \subsection{Uruchomienie aplikacji}
@@ -165,10 +173,6 @@ Można uruchomić aplikację wykorzystując jedynie bieżącą maszynę za pomoc
     \item \textit{\$ make run\_local -j} -- dla wariantu A makefile
     \item \textit{\$ make -f MakefileShippedSDL run\_local -j} -- dla wariantu B makefile
 \end{itemize}
-
-Aby uruchomić ją na wielu komputerach jednocześnie należy manualnie wygenerować
-plik zawierający nazwy komputerów dostępnych w sieci LAN poprzez protokół SSH i
-uruchomić serwer za pomocą adekwatnej dyrektywy \textit{mpiexec}.
 
 \subsection{Obsługa klienta}
 Po uruchomieniu aplikacji (tj. poprawnym uruchomieniu klienta i serwera) pojawia
